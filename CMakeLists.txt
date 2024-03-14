@@ -37,7 +37,8 @@ else()
 endif()
 
 # Set CMake/CPack variables
-list( APPEND CMAKE_PREFIX_PATH ${ROCM_PATH} ${ROCM_PATH}/llvm)
+list(APPEND CMAKE_PREFIX_PATH ${ROCM_PATH} ${ROCM_PATH}/llvm)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Prefix install path")
 set(CPACK_PACKAGING_INSTALL_PREFIX "${ROCM_PATH}" CACHE PATH "Path to install to when packaged.")
 set(CMAKE_CXX_STANDARD 14)
@@ -83,7 +84,7 @@ endif()
 set(GPU_TARGETS "${SUPPORTED_GPUS}" CACHE STRING "List of specific GPU architectures to build for.")
 message(STATUS "Compiling for ${GPU_TARGETS}")
 
-find_package(RCCL HINTS CONFIG REQUIRED PATHS "${ROCM_PATH}")
+find_package(RCCL HINTS CONFIG REQUIRED PATHS ${MSCCLPP_INSTALL_DIR})
 
 if (NOT NO_MPI)
     # CHECK for MPI Path first. User requested this directory explicitely

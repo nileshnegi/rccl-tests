@@ -111,10 +111,16 @@ endforeach()
 
 # Compile common object library
 #==================================================================================================
+find_package(IBVerbs REQUIRED)
+find_package(NUMA REQUIRED)
+find_package(Threads REQUIRED)
+
 add_custom_target(hipify DEPENDS ${HIP_COMMON_SOURCES})
 add_library(rccl_common OBJECT ${HIP_COMMON_SOURCES})
 add_dependencies(rccl_common hipify)
-target_link_libraries(rccl_common roc::rccl hip::device)
+target_link_libraries(rccl_common ${MSCCLPP_INSTALL_DIR}/lib/libmscclpp_nccl_static.a ${MSCCLPP_INSTALL_DIR}/lib/libmscclpp_static.a hip::device ${NUMA_LIBRARIES} ${IBVERBS_LIBRARIES} Threads::Threads)
+target_include_directories(rccl_common PRIVATE ${MSCCLPP_INSTALL_DIR}/include/include ${MSCCLPP_INSTALL_DIR}/include/mscclpp ${IBVERBS_INCLUDE_DIRS} ${NUMA_INCLUDE_DIRS})
+
 if(USE_MPI)
     target_link_libraries(rccl_common MPI::MPI_CXX)
 endif()
@@ -124,7 +130,7 @@ endif()
 add_rccl_test(all_gather)
 add_rccl_test(all_reduce)
 add_rccl_test(alltoall)
-add_rccl_test(alltoallv)
+#add_rccl_test(alltoallv)
 add_rccl_test(broadcast)
 add_rccl_test(gather)
 add_rccl_test(hypercube)

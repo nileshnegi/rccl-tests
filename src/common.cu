@@ -1219,7 +1219,7 @@ testResult_t run() {
 #endif
 
   // 'cuda-memcheck --leak-check full' requires this
-  PRINT("%s\n", ncclGetLastError(NULL));
+  // PRINT("%s\n", ncclGetLastError(NULL));
   cudaDeviceReset();
 
   if (errors[0] || bw[0] < check_avg_bw*(0.9))

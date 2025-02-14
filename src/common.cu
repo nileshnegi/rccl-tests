@@ -31,6 +31,13 @@ int test_ncclVersion = 0; // init'd with ncclGetVersion()
 int32_t gpu_block3;
 size_t cache_bytes = 192 * 1024 * 1024; // Use 192MB
 
+// RCCL_FLOAT8 support
+bool rccl_float8_useFnuz = false;
+bool IsArchMatch(char const* arch, char const* target) {
+  // helper function to reduce clutter in code elsewhere.  Returns true on match.
+  return (strncmp(arch, target, strlen(target)) == 0);
+}
+
 #if NCCL_MAJOR >= 2
   ncclDataType_t test_types[ncclNumTypes] = {
     ncclInt8, ncclUint8, ncclInt32, ncclUint32, ncclInt64, ncclUint64, ncclHalf, ncclFloat, ncclDouble
@@ -1326,6 +1333,13 @@ testResult_t run() {
   int localSize = 0;
   char hostname[1024];
   getHostName(hostname, 1024);
+
+  hipDeviceProp_t devProp;
+  CUDACHECK(hipGetDeviceProperties(&devProp, 0));
+  if (IsArchMatch(devProp.gcnArchName, "gfx942")) {
+    PRINT("On gfx942 architecture, using FNUZ FP8 types");
+    rccl_float8_useFnuz = true;
+  }
 
 #ifdef MPI_SUPPORT
   MPI_Comm_size(MPI_COMM_WORLD, &totalProcs);
